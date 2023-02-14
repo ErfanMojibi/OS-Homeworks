@@ -178,6 +178,13 @@ int main (int argc, char *argv[]) {
   if ((argc - optind) < 1) {
     // No input file specified, instead, read from STDIN instead.
     infile = stdin;
+    fopen(infile, "r");
+    if(count_mode){
+        total_words += num_words(infile);
+    } else {
+      count_words(&word_counts, infile);
+    }
+    fclose(infile);
   } else {
     // At least one file specified. Useful functions: fopen(), fclose().
     // The first file can be found at argv[optind]. The last file can be
