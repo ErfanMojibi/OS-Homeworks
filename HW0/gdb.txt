@@ -1,63 +1,102 @@
 GDB Practice:
 
 آ.
-
+gdb map
 ب.
-
+break 1
+or
+break main
 ج.
-
+run
 د.
-
+print argv
     *
-
+0x7fffffffe188
 ه.
-
+print *argv
     *
-
+0x7fffffffe401 "/home/vagrant/code/handouts/HW0/map"
 و.
-
+next 3
 ز.
-
+info address recur
     *
-
+Symbol "recur" is a function at address 0x5555555546cd.
 ح.
-
+step
 ط.
-
+next
+next
 ی.
-
-ک
-
+layout asm
+ک.
+nexti 4
 ل.
-
-    *
-
+info registers
+    *                                                                                     9                   702
+rax            0x2      2
+rbx            0x0      0
+rcx            0x0      0
+rdx            0x0      0
+rsi            0x555555756340   93824994337600
+rdi            0x2      2
+rbp            0x7fffffffe060   0x7fffffffe060
+rsp            0x7fffffffe040   0x7fffffffe040
+r8             0x0      0
+r9             0x0      0
+r10            0x555555756010   93824994336784
+r11            0x246    582
+r12            0x555555554580   93824992232832
+r13            0x7fffffffe180   140737488347520
+r14            0x0      0
+r15            0x0      0
+rip            0x555555554702   0x555555554702 <recur+53>
+eflags         0x202    [ IF ]
+cs             0x33     51
+ss             0x2b     43
+ds             0x0      0
+es             0x0      0
+fs             0x0      0
+gs             0x0      0
 م.
-
+step
 ن.
-
+layout src
 س.
-
+backtrace
+#0  recur (i=1) at recurse.c:5
+#1  0x0000555555554707 in recur (i=2) at recurse.c:9
+#2  0x0000555555554707 in recur (i=3) at recurse.c:9
+#3  0x00005555555546c6 in main (argc=1, argv=0x7fffffffe188) at map.c:23
 ع.
-
+break 3 if i == 0
 ف.
-
+continue
 ص.
-
+backtrace
+#0  recur (i=0) at recurse.c:5
+#1  0x0000555555554707 in recur (i=1) at recurse.c:9
+#2  0x0000555555554707 in recur (i=2) at recurse.c:9
+#3  0x0000555555554707 in recur (i=3) at recurse.c:9
+#4  0x00005555555546c6 in main (argc=1, argv=0x7fffffffe188) at map.c:23
 ق.
-
+frame 4
+print argc
 ر.
-
+frame 0
+next 3
 ش.
-
+layout asm
 ت.
 
     *
-
+mov    $0x0,%eax
+leaveq
 ث.
-
+layout src
 خ.
-
+next 4
 ذ.
-
+continue
 ض.
+quit

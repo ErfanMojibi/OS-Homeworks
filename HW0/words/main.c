@@ -46,7 +46,28 @@ WordCount *word_counts = NULL;
  */
 int num_words(FILE* infile) {
   int num_words = 0;
-
+  char in_char;
+  int word_len = 0;
+  while((in_char=fgetc(infile)) != EOF){
+    if(isalpha(in_char)){
+      word_len += 1;
+      if(word_len <= MAX_WORD_LEN)
+        continue;
+      else {
+        word_len = 1;
+        num_words+=1;
+      }
+    } else {
+      if(word_len > 1){
+        num_words += 1;
+        word_len = 0;
+      } else {
+        word_len = 0;
+      }
+    }
+  }
+  if(word_len > 1)
+    num_words += 1;
   return num_words;
 }
 
@@ -57,6 +78,36 @@ int num_words(FILE* infile) {
  * Useful functions: fgetc(), isalpha(), tolower(), add_word().
  */
 void count_words(WordCount **wclist, FILE *infile) {
+  char* in_char;
+  char* word = (char*)calloc(65, sizeof(char));
+  int word_len = 0;
+  while((in_char=fgetc(infile)) != EOF){
+    if(isalpha(in_char)){
+      word_len += 1;
+      in_char = tolower(in_char);
+      strncat(word, &in_char, 1);
+      if(word_len <= MAX_WORD_LEN)
+        continue;
+      else {
+        add_word(wclist,word);
+        word = (char*) calloc(65, sizeof(char));;
+        strncat(word, &in_char, 1);
+        word_len = 1;
+      }
+    } else {
+      if(word_len > 1){
+        add_word(wclist, word);
+        word = (char*) calloc(65, sizeof(char));;
+        word_len = 0;
+      } else {
+        word = (char*) calloc(65, sizeof(char));;
+        word_len = 0;
+      }
+    }
+  }
+  if(word_len > 1){
+    add_word(wclist, word);
+  }
 }
 
 /*
@@ -64,7 +115,7 @@ void count_words(WordCount **wclist, FILE *infile) {
  * Useful function: strcmp().
  */
 static bool wordcount_less(const WordCount *wc1, const WordCount *wc2) {
-  return 0;
+  return wc1->count == wc2->count ? (strcmp(wc1->word, wc2->word) < 0 ? true : false): wc1->count < wc2->count;
 }
 
 // In trying times, displays a helpful message.
@@ -131,6 +182,16 @@ int main (int argc, char *argv[]) {
     // At least one file specified. Useful functions: fopen(), fclose().
     // The first file can be found at argv[optind]. The last file can be
     // found at argv[argc-1].
+    for(int i = optind; i <= argc-1; i++){
+      infile = fopen(argv[i], "r");
+      if(count_mode){
+          total_words += num_words(infile);
+      } else {
+        count_words(&word_counts, infile);
+      }
+      fclose(infile);
+    }
+    
   }
 
   if (count_mode) {
