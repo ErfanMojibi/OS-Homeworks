@@ -1,7 +1,6 @@
 *.S
 *.obj
 *.o
-*.txt
 words
 limits
 map
