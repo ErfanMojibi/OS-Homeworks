@@ -30,7 +30,7 @@ next
 ی.
 layout asm
 ک.
-nexti 4
+nexti 5
 ل.
 info registers
     *                                                                                     9                   702
