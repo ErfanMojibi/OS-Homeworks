@@ -36,7 +36,8 @@ O: Object
 *UND*: Undefined
 یعنی به آن نماد در فایل فعلی رفرنس داشته‌ایم اما در اینجا تعریف نشده است.
 5.
-
+در جدول نماد آبجکت فایل
+stdlib
 6.
 در پرونده recurse.obj
 recurse.obj:     file format elf32-i386
