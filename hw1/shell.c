@@ -130,37 +130,41 @@ int program_exists(char* path){
   return 0;
 }
 int execute_program(tok_t arg[]){
-  if(arg[0][0] == '/'){
+  if(arg[0][0] == '/'){ // check for absolute path programs
       execute_program_with_absolute_path(arg);
-  } else {
-      char *PATH;
+  } else { 
       char *sep = ":";
-      PATH = getenv("PATH");
+      char *PATH = (char*) calloc(1024, 1); 
+      strcpy(PATH, getenv("PATH")); //get path
       int flag = 0;
       if(PATH){
           char* token = strtok(PATH, sep);
           while(token != NULL){
-            char* read_path = (char*)malloc(500); //TODO size
+            char read_path[500]; //TODO size
 
+            // concat program name to path
             strcpy(read_path, token);
             strcat(read_path, "/");
             strcat(read_path, arg[0]);
-            
+
+            // execute if program exists
             if(program_exists(read_path)){
               arg[0] = read_path;
-               execute_program_with_absolute_path(arg);
-               flag = 1;
-               break;
+              execute_program_with_absolute_path(arg);
+              //free(PATH);
+              flag = 1;
+              break;
             } else {
               token = strtok(NULL, sep);
             }
-            free(read_path);
           }
+        
       }  else {
           fprintf(stdout,"error in getting path\n");
       }  
       if(!flag)
         fprintf(stdout,"program didn't exist\n");
+      
       return 1;
   }
 
