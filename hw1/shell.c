@@ -25,6 +25,7 @@ int cmd_quit(tok_t arg[]) {
 
 int cmd_help(tok_t arg[]);
 int pwd();
+int cd(tok_t arg[]);
 
 /* Command Lookup table */
 typedef int cmd_fun_t (tok_t args[]); /* cmd functions take token array and return int */
@@ -37,7 +38,8 @@ typedef struct fun_desc {
 fun_desc_t cmd_table[] = {
   {cmd_help, "?", "show this help menu"},
   {cmd_quit, "quit", "quit the command shell"},
-  {pwd, "pwd", "print working directory"}
+  {pwd, "pwd", "print working directory"},
+  {cd, "cd", "change working directory"}
 };
 
 int cmd_help(tok_t arg[]) {
@@ -109,6 +111,13 @@ int pwd(){
     printf("%s\n", path);
   } else{
     printf("error occured");
+  }
+  return 1;
+}
+
+int cd(tok_t arg[]){
+  if(chdir(arg[0]) != 0){
+    printf("error occured in changing directory\n");
   }
   return 1;
 }
