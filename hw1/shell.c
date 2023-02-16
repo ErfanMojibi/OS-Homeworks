@@ -122,6 +122,17 @@ int cd(tok_t arg[]){
   return 1;
 }
 
+int execute_program(tok_t arg[]){
+    int child_pid = fork();
+    if(child_pid == 0){
+      execv(arg[0], arg);
+    } else {
+      wait(child_pid);
+      return 1;
+    }
+    return 0;
+}
+
 int shell (int argc, char *argv[]) {
   char *s = malloc(INPUT_STRING_SIZE+1);			/* user input string */
   tok_t *t;			/* tokens parsed from input */
@@ -142,7 +153,8 @@ int shell (int argc, char *argv[]) {
     fundex = lookup(t[0]); /* Is first token a shell literal */
     if(fundex >= 0) cmd_table[fundex].fun(&t[1]);
     else {
-      fprintf(stdout, "This shell only supports built-ins. Replace this to run programs as commands.\n");
+      execute_program(t);
+      //fprintf(stdout, "This shell only supports built-ins. Replace this to run programs as commands.\n");
     }
     // fprintf(stdout, "%d: ", lineNum);
   }
