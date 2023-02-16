@@ -26,7 +26,9 @@ int cmd_quit(tok_t arg[]) {
 int cmd_help(tok_t arg[]);
 int pwd();
 int cd(tok_t arg[]);
-
+int execute_program_with_absolute_path(tok_t arg[]);
+int execute_program(tok_t arg[]);
+int program_exists(char* path);
 /* Command Lookup table */
 typedef int cmd_fun_t (tok_t args[]); /* cmd functions take token array and return int */
 typedef struct fun_desc {
@@ -106,23 +108,62 @@ process* create_process(char* inputString)
 
 int pwd(){
   // printf("%s", get_current_dir_name());
-  char path[100];
+  char path[100]; //TODO size
   if(getcwd(path, sizeof(path)) != NULL){
-    printf("%s\n", path);
+    fprintf(stdout, "%s\n", path);
   } else{
-    printf("error occured");
+    fprintf(stdout,"error occured");
   }
   return 1;
 }
 
 int cd(tok_t arg[]){
   if(chdir(arg[0]) != 0){
-    printf("error occured in changing directory\n");
+    fprintf(stdout, "error occured in changing directory\n");
   }
   return 1;
 }
-
+int program_exists(char* path){
+  if(!access(path, F_OK)){
+      return 1;
+  }
+  return 0;
+}
 int execute_program(tok_t arg[]){
+  if(arg[0][0] == '/'){
+      execute_program_with_absolute_path(arg);
+  } else {
+      char *PATH;
+      char *sep = ":";
+      PATH = getenv("PATH");
+      int flag = 0;
+      if(PATH){
+          char* token = strtok(PATH, sep);
+          while(token != NULL){
+            char* read_path = (char*)malloc(80); //TODO size
+
+            strcpy(read_path, token);
+            strcat(read_path, "/");
+            strcat(read_path, arg[0]);
+            
+            if(program_exists(read_path)){
+              arg[0] = read_path;
+               execute_program_with_absolute_path(arg);
+               flag = 1;
+               break;
+            } else {
+              token = strtok(NULL, sep);
+            }
+          }
+      }  else {
+          fprintf(stdout,"error in gettin path\n");
+      }  
+      if(!flag)
+        fprintf(stdout,"programming didn't exist\n");
+  }
+
+}
+int execute_program_with_absolute_path(tok_t arg[]){
     int child_pid = fork();
     if(child_pid == 0){
       execv(arg[0], arg);
