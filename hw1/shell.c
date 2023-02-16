@@ -159,7 +159,7 @@ int execute_program(tok_t arg[]){
           fprintf(stdout,"error in gettin path\n");
       }  
       if(!flag)
-        fprintf(stdout,"programming didn't exist\n");
+        fprintf(stdout,"program didn't exist\n");
   }
 
 }
