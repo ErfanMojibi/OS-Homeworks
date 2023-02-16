@@ -108,7 +108,7 @@ process* create_process(char* inputString)
 
 int pwd(){
   // printf("%s", get_current_dir_name());
-  char path[100]; //TODO size
+  char path[500]; //TODO size
   if(getcwd(path, sizeof(path)) != NULL){
     fprintf(stdout, "%s\n", path);
   } else{
@@ -140,7 +140,7 @@ int execute_program(tok_t arg[]){
       if(PATH){
           char* token = strtok(PATH, sep);
           while(token != NULL){
-            char* read_path = (char*)malloc(80); //TODO size
+            char* read_path = (char*)malloc(500); //TODO size
 
             strcpy(read_path, token);
             strcat(read_path, "/");
@@ -154,12 +154,14 @@ int execute_program(tok_t arg[]){
             } else {
               token = strtok(NULL, sep);
             }
+            free(read_path);
           }
       }  else {
-          fprintf(stdout,"error in gettin path\n");
+          fprintf(stdout,"error in getting path\n");
       }  
       if(!flag)
         fprintf(stdout,"program didn't exist\n");
+      return 1;
   }
 
 }
