@@ -29,9 +29,7 @@ int cmd_quit(tok_t arg[])
 int cmd_help(tok_t arg[]);
 int pwd();
 int cd(tok_t arg[]);
-int execute_program_with_absolute_path(process* p, tok_t arg[]);
-int execute_program(process *p, tok_t arg[]);
-int program_exists(char *path);
+
 /* Command Lookup table */
 typedef int cmd_fun_t(tok_t args[]); /* cmd functions take token array and return int */
 typedef struct fun_desc
@@ -144,88 +142,7 @@ int cd(tok_t arg[])
   return 1;
 }
 
-int program_exists(char *path)
-{
-  if (!access(path, F_OK))
-  {
-    return 1;
-  }
-  return 0;
-}
 
-int execute_program_with_absolute_path(process* p, tok_t arg[])
-{
-  // do fork
-  pid_t child_pid = fork();
-
-  if (child_pid == 0)
-  {
-
-    // set group pid
-    setpgid(getpid(), getpid());
-    // set foreground
-    tcsetpgrp(STDIN_FILENO, getpid());
-    // output redirect
-    int out_index = isDirectTok(arg, ">");
-    int stdout_dup;
-    if (out_index != -1)
-    {
-      fflush(stdout);
-      stdout_dup = dup(fileno(stdout));
-      int user_file = open(arg[out_index + 1], O_CREAT | O_TRUNC | O_WRONLY, 0666);
-      dup2(user_file, fileno(stdout));
-      close(stdout);
-      arg[out_index] = NULL;
-    }
-
-    // input redirect
-    int in_index = isDirectTok(arg, "<");
-    int stdin_dup;
-    if (in_index != -1)
-    {
-      stdin_dup = dup(fileno(stdin));
-      int user_file = open(arg[in_index + 1], O_RDONLY | O_CREAT, 0666);
-      dup2(user_file, fileno(stdin));
-
-      fflush(stdin);
-      close(stdin);
-      arg[in_index] = NULL;
-    }
-
-    // execute
-    execv(arg[0], arg);
-
-    // output redirect reset
-    if (out_index != -1)
-    {
-      dup2(stdout_dup, fileno(stdout));
-      close(stdout_dup);
-      fflush(stdout);
-    }
-
-    // input redirect reset
-    if (in_index != -1)
-    {
-      dup2(stdin_dup, fileno(stdin));
-      close(stdin_dup);
-      fflush(stdin);
-    }
-  }
-  else
-  {
-    // set pid
-    p->pid = child_pid;
-    
-
-    // wait
-    int status;
-    waitpid(child_pid, &status, WIFEXITED(status));
-    printf("here\n");
-    tcsetpgrp(shell_terminal, shell_pgid);
-    return 1;
-  }
-  return 0;
-}
 
 int shell(int argc, char *argv[])
 {

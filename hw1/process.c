@@ -11,6 +11,18 @@
 #include <fcntl.h>
 
 /**
+ * checks if program path exists
+*/
+int program_exists(char *path)
+{
+  if (!access(path, F_OK))
+  {
+    return 1;
+  }
+  return 0;
+}
+
+/**
  * gives program path
  */
 char *get_program_path(tok_t arg[])
@@ -55,12 +67,13 @@ void launch_process(process *p)
     fprintf(stdin, "error in fork");
     exit(-1);
   } else if (child_pid == 0){
+    // output redirect
     int out_index = isDirectTok(p->argv, ">");
     int stdout_dup;
     if (out_index != -1)
     {
-      fflush(stdout);
-      stdout_dup = dup(fileno(stdout));
+      //fflush(stdout);
+      //stdout_dup = dup(fileno(stdout));
       int user_file = open(p->argv[out_index + 1], O_CREAT | O_TRUNC | O_WRONLY, 0666);
       dup2(user_file, fileno(stdout));
       close(stdout);
@@ -72,7 +85,7 @@ void launch_process(process *p)
     int stdin_dup;
     if (in_index != -1)
     {
-      stdin_dup = dup(fileno(stdin));
+      //stdin_dup = dup(fileno(stdin));
       int user_file = open(p->argv[in_index + 1], O_RDONLY | O_CREAT, 0666);
       dup2(user_file, fileno(stdin));
 
@@ -81,29 +94,17 @@ void launch_process(process *p)
       p->argv[in_index] = NULL;
     }
 
+    //
+    //setgpid(getpid(), getpid());
+
+    // execute
     char* path = get_program_path(p->argv);
     execv(path, p->argv);
   
-    // output redirect reset
-    if (out_index != -1)
-    {
-      dup2(stdout_dup, fileno(stdout));
-      close(stdout_dup);
-      fflush(stdout);
-    }
-
-    // input redirect reset
-    if (in_index != -1)
-    {
-      dup2(stdin_dup, fileno(stdin));
-      close(stdin_dup);
-      fflush(stdin);
-    }
   
   } else {
     int status;
     int ret = waitpid(child_pid, &status, WIFEXITED(status));
-
   }
 }
 
