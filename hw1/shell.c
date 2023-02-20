@@ -204,7 +204,7 @@ int execute_program_with_absolute_path(tok_t arg[])
     // output redirect
     int out_index = isDirectTok(arg, ">");
     int stdout_dup;
-    if (out_index != 0)
+    if (out_index != -1)
     {
       fflush(stdout);
       stdout_dup = dup(fileno(stdout));
@@ -217,7 +217,7 @@ int execute_program_with_absolute_path(tok_t arg[])
     // input redirect
     int in_index = isDirectTok(arg, "<");
     int stdin_dup;
-    if (in_index != 0)
+    if (in_index != -1)
     {
       stdin_dup = dup(fileno(stdin));
       int user_file = open(arg[in_index + 1], O_RDONLY | O_CREAT, 0666);
@@ -227,11 +227,11 @@ int execute_program_with_absolute_path(tok_t arg[])
       close(stdin);
       arg[in_index] = NULL;
     }
-    
+
     execv(arg[0], arg);
 
     // output redirect reset
-    if (out_index != 0)
+    if (out_index != -1)
     {
       dup2(stdout_dup, fileno(stdout));
       close(stdout_dup);
@@ -239,7 +239,7 @@ int execute_program_with_absolute_path(tok_t arg[])
     }
 
     // input redirect reset
-    if (in_index != 0)
+    if (in_index != -1)
     {
       dup2(stdin_dup, fileno(stdin));
       close(stdin_dup);
