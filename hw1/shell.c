@@ -29,8 +29,8 @@ int cmd_quit(tok_t arg[])
 int cmd_help(tok_t arg[]);
 int pwd();
 int cd(tok_t arg[]);
-int execute_program_with_absolute_path(tok_t arg[]);
-int execute_program(tok_t arg[]);
+int execute_program_with_absolute_path(process* p, tok_t arg[]);
+int execute_program(process *p, tok_t arg[]);
 int program_exists(char *path);
 /* Command Lookup table */
 typedef int cmd_fun_t(tok_t args[]); /* cmd functions take token array and return int */
@@ -77,17 +77,15 @@ void init_shell()
       is not interactive */
   shell_is_interactive = isatty(shell_terminal);
 
-  if (shell_is_interactive)
-  {
+  if(shell_is_interactive){
 
     /* force into foreground */
-    while (tcgetpgrp(shell_terminal) != (shell_pgid = getpgrp()))
-      kill(-shell_pgid, SIGTTIN);
+    while(tcgetpgrp (shell_terminal) != (shell_pgid = getpgrp()))
+      kill( - shell_pgid, SIGTTIN);
 
     shell_pgid = getpid();
     /* Put shell in its own process group */
-    if (setpgid(shell_pgid, shell_pgid) < 0)
-    {
+    if(setpgid(shell_pgid, shell_pgid) < 0){
       perror("Couldn't put the shell in its own process group");
       exit(1);
     }
@@ -110,10 +108,16 @@ void add_process(process *p)
 /**
  * Creates a process given the inputString from stdin
  */
-process *create_process(char *inputString)
+process *create_process(tok_t arg[])
 {
-  /** YOUR CODE HERE */
-  return NULL;
+  process *p = (process *) malloc(sizeof(process));
+
+  p->argv = arg;
+  p->stdin = STDIN_FILENO;
+  p->stdout = STDOUT_FILENO;
+  p->stderr = STDERR_FILENO;
+
+  return p;
 }
 
 int pwd()
@@ -139,6 +143,7 @@ int cd(tok_t arg[])
   }
   return 1;
 }
+
 int program_exists(char *path)
 {
   if (!access(path, F_OK))
@@ -147,60 +152,19 @@ int program_exists(char *path)
   }
   return 0;
 }
-int execute_program(tok_t arg[])
+
+int execute_program_with_absolute_path(process* p, tok_t arg[])
 {
-  if (arg[0][0] == '/')
-  { // check for absolute path programs
-    execute_program_with_absolute_path(arg);
-  }
-  else
-  {
-    char *sep = ":";
-    char *PATH = (char *)calloc(1024, 1);
-    strcpy(PATH, getenv("PATH")); // get path
-    int flag = 0;
-    if (PATH)
-    {
-      char *token = strtok(PATH, sep);
-      while (token != NULL)
-      {
-        char read_path[500]; // TODO size
+  // do fork
+  pid_t child_pid = fork();
 
-        // concat program name to path
-        strcpy(read_path, token);
-        strcat(read_path, "/");
-        strcat(read_path, arg[0]);
-
-        // execute if program exists
-        if (program_exists(read_path))
-        {
-          arg[0] = read_path;
-          execute_program_with_absolute_path(arg);
-          // free(PATH);
-          flag = 1;
-          break;
-        }
-        else
-        {
-          token = strtok(NULL, sep);
-        }
-      }
-    }
-    else
-    {
-      fprintf(stdout, "error in getting path\n");
-    }
-    if (!flag)
-      fprintf(stdout, "program didn't exist\n");
-
-    return 1;
-  }
-}
-int execute_program_with_absolute_path(tok_t arg[])
-{
-  int child_pid = fork();
   if (child_pid == 0)
   {
+
+    // set group pid
+    setpgid(getpid(), getpid());
+    // set foreground
+    tcsetpgrp(STDIN_FILENO, getpid());
     // output redirect
     int out_index = isDirectTok(arg, ">");
     int stdout_dup;
@@ -228,6 +192,7 @@ int execute_program_with_absolute_path(tok_t arg[])
       arg[in_index] = NULL;
     }
 
+    // execute
     execv(arg[0], arg);
 
     // output redirect reset
@@ -248,8 +213,15 @@ int execute_program_with_absolute_path(tok_t arg[])
   }
   else
   {
+    // set pid
+    p->pid = child_pid;
+    
+
+    // wait
     int status;
     waitpid(child_pid, &status, WIFEXITED(status));
+    printf("here\n");
+    tcsetpgrp(shell_terminal, shell_pgid);
     return 1;
   }
   return 0;
@@ -273,14 +245,14 @@ int shell(int argc, char *argv[])
   // fprintf(stdout, "%d: ", lineNum);
   while ((s = freadln(stdin)))
   {
-    t = getToks(s);        /* break the line into tokens */
+    tok_t *t = getToks(s);
     fundex = lookup(t[0]); /* Is first token a shell literal */
-
     if (fundex >= 0)
       cmd_table[fundex].fun(&t[1]);
     else
     {
-      execute_program(t);
+      process *p = create_process(t);
+      launch_process(p);
     }
 
     // fprintf(stdout, "%d: ", lineNum);
