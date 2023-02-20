@@ -248,8 +248,8 @@ int execute_program_with_absolute_path(tok_t arg[])
   }
   else
   {
-    int* status;
-    waitpid(child_pid, status, WNOHANG);
+    int status;
+    waitpid(child_pid, &status, WUNTRACED | WCONTINUED);
     return 1;
   }
   return 0;
