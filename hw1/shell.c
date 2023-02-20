@@ -66,6 +66,17 @@ int lookup(char cmd[])
   return -1;
 }
 
+void ignore_signals() {
+    signal(SIGINT, SIG_IGN);
+    signal(SIGTERM, SIG_IGN);
+    signal(SIGQUIT, SIG_IGN);
+    signal(SIGKILL, SIG_IGN);
+    signal(SIGTSTP, SIG_IGN);
+    signal(SIGCONT, SIG_IGN);
+    signal(SIGTTIN, SIG_IGN);
+    signal(SIGTTOU, SIG_IGN);
+}
+
 void init_shell()
 {
   /* Check if we are running interactively */
@@ -91,8 +102,8 @@ void init_shell()
     /* Take control of the terminal */
     tcsetpgrp(shell_terminal, shell_pgid);
     tcgetattr(shell_terminal, &shell_tmodes);
+    ignore_signals();
   }
-  /** YOUR CODE HERE */
 }
 
 /**

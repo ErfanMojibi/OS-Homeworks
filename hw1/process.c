@@ -9,7 +9,7 @@
 #include <sys/wait.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-
+#include <unistd.h>
 /**
  * checks if program path exists
 */
@@ -54,6 +54,12 @@ char *get_program_path(tok_t arg[])
   }
 }
 
+void handle_signals(){
+    signal(SIGINT, SIG_DFL);
+    signal(SIGQUIT, SIG_DFL);
+    signal(SIGTSTP, SIG_DFL);
+}
+
 /**
  * Executes the process p.
  * If the shell is in interactive mode and the process is a foreground process,
@@ -72,8 +78,6 @@ void launch_process(process *p)
     int stdout_dup;
     if (out_index != -1)
     {
-      //fflush(stdout);
-      //stdout_dup = dup(fileno(stdout));
       int user_file = open(p->argv[out_index + 1], O_CREAT | O_TRUNC | O_WRONLY, 0666);
       dup2(user_file, fileno(stdout));
       close(stdout);
@@ -85,7 +89,6 @@ void launch_process(process *p)
     int stdin_dup;
     if (in_index != -1)
     {
-      //stdin_dup = dup(fileno(stdin));
       int user_file = open(p->argv[in_index + 1], O_RDONLY | O_CREAT, 0666);
       dup2(user_file, fileno(stdin));
 
@@ -94,17 +97,29 @@ void launch_process(process *p)
       p->argv[in_index] = NULL;
     }
 
-    //
-    //setgpid(getpid(), getpid());
-
+    // pain
+    // if(getpgid(getpid()) == -1)
+    //   setpgid(getpid(), getpid());
+    // while(tcgetpgrp(shell_terminal)!= getpid()){
+    //   printf("here");
+    //   sleep(1);
+    // }
     // execute
+    handle_signals();
     char* path = get_program_path(p->argv);
     execv(path, p->argv);
   
   
   } else {
+    // signal(SIGTTOU, SIG_IGN);
+    setpgid(child_pid, child_pid);
+    if(tcgetpgrp(shell_terminal) == getpgid(getpid())){
+      tcsetpgrp(shell_terminal, child_pid);
+    
+    }
     int status;
     int ret = waitpid(child_pid, &status, WIFEXITED(status));
+    tcsetpgrp(shell_terminal, shell_pgid);
   }
 }
 
