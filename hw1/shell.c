@@ -66,15 +66,16 @@ int lookup(char cmd[])
   return -1;
 }
 
-void ignore_signals() {
-    signal(SIGINT, SIG_IGN);
-    signal(SIGTERM, SIG_IGN);
-    signal(SIGQUIT, SIG_IGN);
-    signal(SIGKILL, SIG_IGN);
-    signal(SIGTSTP, SIG_IGN);
-    signal(SIGCONT, SIG_IGN);
-    signal(SIGTTIN, SIG_IGN);
-    signal(SIGTTOU, SIG_IGN);
+void ignore_signals()
+{
+  signal(SIGINT, SIG_IGN);
+  signal(SIGTERM, SIG_IGN);
+  signal(SIGQUIT, SIG_IGN);
+  signal(SIGKILL, SIG_IGN);
+  signal(SIGTSTP, SIG_IGN);
+  signal(SIGCONT, SIG_IGN);
+  signal(SIGTTIN, SIG_IGN);
+  signal(SIGTTOU, SIG_IGN);
 }
 
 void init_shell()
@@ -86,15 +87,17 @@ void init_shell()
       is not interactive */
   shell_is_interactive = isatty(shell_terminal);
 
-  if(shell_is_interactive){
+  if (shell_is_interactive)
+  {
 
     /* force into foreground */
-    while(tcgetpgrp (shell_terminal) != (shell_pgid = getpgrp()))
-      kill( - shell_pgid, SIGTTIN);
+    while (tcgetpgrp(shell_terminal) != (shell_pgid = getpgrp()))
+      kill(-shell_pgid, SIGTTIN);
 
     shell_pgid = getpid();
     /* Put shell in its own process group */
-    if(setpgid(shell_pgid, shell_pgid) < 0){
+    if (setpgid(shell_pgid, shell_pgid) < 0)
+    {
       perror("Couldn't put the shell in its own process group");
       exit(1);
     }
@@ -119,7 +122,7 @@ void add_process(process *p)
  */
 process *create_process(tok_t arg[])
 {
-  process *p = (process *) malloc(sizeof(process));
+  process *p = (process *)malloc(sizeof(process));
 
   p->argv = arg;
   p->stdin = STDIN_FILENO;
@@ -153,7 +156,20 @@ int cd(tok_t arg[])
   return 1;
 }
 
-
+int is_background_process(process *p)
+{
+  int i = 0;
+  while (p->argv[i] != NULL)
+  {
+    i += 1;
+  }
+  if (strcmp(p->argv[i - 1], "&") == 0)
+  {
+    p->argv[i-1] = NULL;
+    return 1;
+  }
+  return 0;
+}
 
 int shell(int argc, char *argv[])
 {
@@ -180,6 +196,7 @@ int shell(int argc, char *argv[])
     else
     {
       process *p = create_process(t);
+      p->background = is_background_process(p) ? 't' : 'f';
       launch_process(p);
     }
 

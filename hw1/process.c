@@ -10,6 +10,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include "parse.h"
 /**
  * checks if program path exists
  */
@@ -102,22 +103,21 @@ void launch_process(process *p)
       p->argv[in_index] = NULL;
     }
 
-    // pain
-    // if(getpgid(getpid()) == -1)
-    //   setpgid(getpid(), getpid());
-    // while(tcgetpgrp(shell_terminal)!= getpid()){
-    //   printf("here");
-    //   sleep(1);
-    // }
+
     // execute
-    handle_signals();
+    if(p->background == 't')
+      handle_signals();
     char *path = get_program_path(p->argv);
     execv(path, p->argv);
   }
   else
   {
     p->pid = child_pid;
-    put_process_in_foreground(p, 0);
+    if(p->background == 't'){
+      put_process_in_foreground(p, 0);
+    }else{
+
+    }
   }
 }
 
