@@ -118,7 +118,6 @@ void launch_process(process *p)
     }
     else
     {
-      printf("in bg");
     }
   }
 }

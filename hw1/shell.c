@@ -29,6 +29,7 @@ int cmd_quit(tok_t arg[])
 int cmd_help(tok_t arg[]);
 int pwd();
 int cd(tok_t arg[]);
+int cmd_wait(tok_t arg[]);
 
 /* Command Lookup table */
 typedef int cmd_fun_t(tok_t args[]); /* cmd functions take token array and return int */
@@ -40,6 +41,7 @@ typedef struct fun_desc
 } fun_desc_t;
 
 fun_desc_t cmd_table[] = {
+    {cmd_wait, "wait", "waits for background processes to finish"},
     {cmd_help, "?", "show this help menu"},
     {cmd_quit, "quit", "quit the command shell"},
     {pwd, "pwd", "print working directory"},
@@ -153,6 +155,11 @@ int cd(tok_t arg[])
   {
     fprintf(stdout, "error occured in changing directory\n");
   }
+  return 1;
+}
+
+int cmd_wait(tok_t arg[]){
+  wait(NULL);
   return 1;
 }
 
