@@ -12,7 +12,7 @@
 #include <unistd.h>
 /**
  * checks if program path exists
-*/
+ */
 int program_exists(char *path)
 {
   if (!access(path, F_OK))
@@ -38,7 +38,7 @@ char *get_program_path(tok_t arg[])
     tok_t *t = getToks(PATH);
     for (int i = 0; t[i] != NULL; i++)
     {
-      char* read_path = (char*)malloc(1024*sizeof(char*));
+      char *read_path = (char *)malloc(1024 * sizeof(char *));
       strcpy(read_path, t[i]);
       strcat(read_path, "/");
       strcat(read_path, arg[0]);
@@ -46,7 +46,9 @@ char *get_program_path(tok_t arg[])
       {
         free(PATH);
         return read_path;
-      } else {
+      }
+      else
+      {
         free(read_path);
       }
     }
@@ -54,10 +56,11 @@ char *get_program_path(tok_t arg[])
   }
 }
 
-void handle_signals(){
-    signal(SIGINT, SIG_DFL);
-    signal(SIGQUIT, SIG_DFL);
-    signal(SIGTSTP, SIG_DFL);
+void handle_signals()
+{
+  signal(SIGINT, SIG_DFL);
+  signal(SIGQUIT, SIG_DFL);
+  signal(SIGTSTP, SIG_DFL);
 }
 
 /**
@@ -72,7 +75,9 @@ void launch_process(process *p)
   {
     fprintf(stdin, "error in fork");
     exit(-1);
-  } else if (child_pid == 0){
+  }
+  else if (child_pid == 0)
+  {
     // output redirect
     int out_index = isDirectTok(p->argv, ">");
     int stdout_dup;
@@ -106,20 +111,13 @@ void launch_process(process *p)
     // }
     // execute
     handle_signals();
-    char* path = get_program_path(p->argv);
+    char *path = get_program_path(p->argv);
     execv(path, p->argv);
-  
-  
-  } else {
-    // signal(SIGTTOU, SIG_IGN);
-    setpgid(child_pid, child_pid);
-    if(tcgetpgrp(shell_terminal) == getpgid(getpid())){
-      tcsetpgrp(shell_terminal, child_pid);
-    
-    }
-    int status;
-    int ret = waitpid(child_pid, &status, WIFEXITED(status));
-    tcsetpgrp(shell_terminal, shell_pgid);
+  }
+  else
+  {
+    p->pid = child_pid;
+    put_process_in_foreground(p, 0);
   }
 }
 
@@ -129,7 +127,11 @@ void launch_process(process *p)
  */
 void put_process_in_foreground(process *p, int cont)
 {
-  /** YOUR CODE HERE */
+  setpgid(p->pid, p->pid);
+  tcsetpgrp(shell_terminal, p->pid);
+  int status;
+  int ret = waitpid(p->pid, &status, WIFEXITED(status));
+  tcsetpgrp(shell_terminal, shell_pgid);
 }
 
 /* Put a process in the background. If the cont argument is true, send
