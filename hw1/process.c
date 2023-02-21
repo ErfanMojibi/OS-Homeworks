@@ -103,20 +103,22 @@ void launch_process(process *p)
       p->argv[in_index] = NULL;
     }
 
-
     // execute
-    if(p->background == 't')
-      handle_signals();
+    handle_signals();
     char *path = get_program_path(p->argv);
     execv(path, p->argv);
   }
   else
   {
     p->pid = child_pid;
-    if(p->background == 't'){
+    if (p->background == 'f')
+    {
+      fflush(stdout);
       put_process_in_foreground(p, 0);
-    }else{
-
+    }
+    else
+    {
+      printf("in bg");
     }
   }
 }
