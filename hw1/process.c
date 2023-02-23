@@ -62,8 +62,10 @@ void handle_signals()
   signal(SIGINT, SIG_DFL);
   signal(SIGQUIT, SIG_DFL);
   signal(SIGTSTP, SIG_DFL);
+  signal(SIGTTOU, SIG_DFL);
+  signal(SIGTTIN, SIG_DFL);
+  signal(SIGCHLD, SIG_DFL);
 }
-
 /**
  * Executes the process p.
  * If the shell is in interactive mode and the process is a foreground process,
@@ -86,7 +88,6 @@ void launch_process(process *p)
     {
       int user_file = open(p->argv[out_index + 1], O_CREAT | O_TRUNC | O_WRONLY, 0666);
       dup2(user_file, fileno(stdout));
-      close(stdout);
       p->argv[out_index] = NULL;
     }
 
@@ -97,12 +98,9 @@ void launch_process(process *p)
     {
       int user_file = open(p->argv[in_index + 1], O_RDONLY | O_CREAT, 0666);
       dup2(user_file, fileno(stdin));
-
-      fflush(stdin);
-      close(stdin);
       p->argv[in_index] = NULL;
     }
-
+    //some
     // execute
     handle_signals();
     char *path = get_program_path(p->argv);
@@ -113,7 +111,6 @@ void launch_process(process *p)
     p->pid = child_pid;
     if (p->background == 'f')
     {
-      fflush(stdout);
       put_process_in_foreground(p, 0);
     }
     else
