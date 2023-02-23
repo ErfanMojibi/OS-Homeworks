@@ -72,6 +72,7 @@ void handle_signals()
  */
 void launch_process(process *p)
 {
+  waitpid(-1, NULL, WNOHANG);
   pid_t child_pid = fork();
   if (child_pid < 0)
   {
@@ -99,11 +100,11 @@ void launch_process(process *p)
       dup2(user_file, fileno(stdin));
       p->argv[in_index] = NULL;
     }
-    //some
     // execute
     handle_signals();
     char *path = get_program_path(p->argv);
     execv(path, p->argv);
+    free(path);
   }
   else
   {
@@ -127,7 +128,8 @@ void put_process_in_foreground(process *p, int cont)
   setpgid(p->pid, p->pid);
   tcsetpgrp(shell_terminal, p->pid);
   int status;
-  int ret = waitpid(p->pid, &status, WIFEXITED(status));
+  int ret = waitpid(p->pid, &p->status, WUNTRACED);
+  // wait(NULL);
   tcsetpgrp(shell_terminal, shell_pgid);
 }
 

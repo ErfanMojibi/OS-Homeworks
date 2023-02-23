@@ -202,6 +202,8 @@ int shell(int argc, char *argv[])
       process *p = create_process(t);
       p->background = is_background_process(p) ? 't' : 'f';
       launch_process(p);
+      free(p);
+      free(t);
     }
 
     // fprintf(stdout, "%d: ", lineNum);
