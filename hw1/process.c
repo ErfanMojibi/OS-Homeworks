@@ -64,7 +64,6 @@ void handle_signals()
   signal(SIGTSTP, SIG_DFL);
   signal(SIGTTOU, SIG_DFL);
   signal(SIGTTIN, SIG_DFL);
-  signal(SIGCHLD, SIG_DFL);
 }
 /**
  * Executes the process p.

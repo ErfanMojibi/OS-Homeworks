@@ -71,11 +71,8 @@ int lookup(char cmd[])
 void ignore_signals()
 {
   signal(SIGINT, SIG_IGN);
-  signal(SIGTERM, SIG_IGN);
   signal(SIGQUIT, SIG_IGN);
-  signal(SIGKILL, SIG_IGN);
   signal(SIGTSTP, SIG_IGN);
-  signal(SIGCONT, SIG_IGN);
   signal(SIGTTIN, SIG_IGN);
   signal(SIGTTOU, SIG_IGN);
 }
