@@ -46,15 +46,27 @@ void http_send_not_found(int fd){
  * ATTENTION: Be careful to optimize your code. Judge is
  *            sesnsitive to time-out errors.
  */
-void serve_file(int fd, char *path) {
-
+void serve_file(int fd, char *path, int size) {
+  char* buf = malloc(1024);
+  snprintf(buf, 1024,"%d", size);
   http_start_response(fd, 200);
-  http_send_header(fd, "Content-Type", http_get_mime_type(path));
-  http_send_header(fd, "Content-Length", "0"); // Change this too
+  http_send_header(fd, "Content-Type", http_get_mime_type(path)); 
+  http_send_header(fd, "Content-Length", buf);
   http_end_headers(fd);
 
-  /* TODO: PART 1 Bullet 2 */
 
+  int file_fd = open(path, O_RDONLY);
+  if(file_fd < 0) {
+    return;
+  }
+  int read_n, read_buf_size = 1024;
+  buf = malloc(read_buf_size);
+  
+  while((read_n = read(file_fd, buf, read_buf_size)) > 0){
+    http_send_data(fd, buf, read_n);
+  }
+  free(buf);
+  close(file_fd);
 }
 
 void serve_directory(int fd, char *path) {
@@ -115,7 +127,7 @@ void handle_files_request(int fd) {
   //stat system call
   stat(path, &sfile);
   if(S_ISREG(sfile.st_mode)){
-
+      serve_file(fd, path, sfile.st_size);
   } else if (S_ISDIR(sfile.st_mode)){
     
   } else {
