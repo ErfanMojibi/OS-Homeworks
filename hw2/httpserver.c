@@ -39,6 +39,16 @@ void http_send_not_found(int fd){
 }
 
 /*
+* return file size if exists
+*/
+int file_exists(char* filename){
+  struct stat buffer;
+  int exist = stat(filename, &buffer);
+  if(!exist)
+    return buffer.st_size;
+  else return -1;
+}
+/*
  * Serves the contents the file stored at `path` to the client socket `fd`.
  * It is the caller's reponsibility to ensure that the file stored at `path` exists.
  * You can change these functions to anything you want.
@@ -48,7 +58,7 @@ void http_send_not_found(int fd){
  */
 void serve_file(int fd, char *path, int size) {
   char* buf = malloc(1024);
-  snprintf(buf, 1024,"%d", size);
+  snprintf(buf, 1024, "%d", size);
   http_start_response(fd, 200);
   http_send_header(fd, "Content-Type", http_get_mime_type(path)); 
   http_send_header(fd, "Content-Length", buf);
@@ -72,7 +82,31 @@ void serve_file(int fd, char *path, int size) {
 void serve_directory(int fd, char *path) {
   http_start_response(fd, 200);
   http_send_header(fd, "Content-Type", http_get_mime_type(".html"));
+  // content length?
   http_end_headers(fd);
+  
+  int buf_size = 1024;
+  char*buf = malloc(buf_size);
+
+  DIR* dir = opendir(path);
+  struct dirent *entry;
+  
+  while ((entry = readdir(dir)) != NULL) {
+    
+    char* ref = malloc(1024);
+    strcpy(ref, path);
+    strcat(ref, "/");
+    strcat(ref, entry->d_name);
+
+   // printf("<a href=\"%s\">%s</a>\n", ref, entry->d_name);
+
+    snprintf(buf, buf_size, "<a href=\"%s\">%s</a>\n", ref, entry->d_name);
+    http_send_string(fd, buf);
+    free(ref);
+  }
+  free(buf);
+  closedir(dir);
+   
 
   /* TODO: PART 1 Bullet 3,4 */
 
@@ -100,7 +134,6 @@ void handle_files_request(int fd) {
     http_start_response(fd, 400);
     http_send_header(fd, "Content-Type", "text/html");
     http_end_headers(fd);
-    printf("hey here\n");
     close(fd);
     return;
   }
@@ -121,7 +154,7 @@ void handle_files_request(int fd) {
   strcpy(path, server_files_directory);
   strcat(path, request->path);
   
-  printf("path: %s\n", path);
+  // printf("path: %s\n", path);
   struct stat sfile;
 
   //stat system call
@@ -129,7 +162,17 @@ void handle_files_request(int fd) {
   if(S_ISREG(sfile.st_mode)){
       serve_file(fd, path, sfile.st_size);
   } else if (S_ISDIR(sfile.st_mode)){
-    
+    // create index.html path
+    char* index_name = "/index.html";
+    char* index_path = malloc(strlen(path) + strlen(index_name) + 1);
+    strcpy(index_path, path);
+    strcat(index_path, index_name);
+    int size;
+    if((size = file_exists(index_path)) != -1){
+      serve_file(fd, index_path, size);
+    } else {
+      serve_directory(fd, path);
+    }
   } else {
     http_send_not_found(fd);
   }
