@@ -270,7 +270,7 @@ void* run_thread(){
   while(1){
     int fd = wq_pop(&work_queue);
     request_handler(fd);
-    close(fd)
+    close(fd);
   }
 }
 
@@ -339,8 +339,10 @@ void serve_forever(int *socket_number, void (*request_handler)(int)) {
         inet_ntoa(client_address.sin_addr),
         client_address.sin_port);
 
-    // TODO: Change me?
-    request_handler(client_socket_number);
+    if(num_threads == 0)
+      request_handler(client_socket_number);
+    else 
+      wq_push(&work_queue, client_socket_number);
     close(client_socket_number);
 
     printf("Accepted connection from %s on port %d\n",
