@@ -266,7 +266,8 @@ void handle_proxy_request(int fd) {
 }
 
 
-void* run_thread(){
+void* run_thread(void* args){
+  void (*request_handler)(int) = args;
   while(1){
     int fd = wq_pop(&work_queue);
     request_handler(fd);
@@ -275,11 +276,11 @@ void* run_thread(){
 }
 
 void init_thread_pool(int num_threads, void (*request_handler)(int)) {
-  pthread_t thread;
+  pthread_t *threads = malloc(num_threads * sizeof(pthread_t));
   for(int i = 0; i < num_threads; i++){
-    pthread_t thread;
-    pthread_create(thread, NULL, run_thread, NULL);
+    pthread_create(&threads[i], NULL, run_thread, request_handler);
   }
+  free(threads);
 }
 
 /*
