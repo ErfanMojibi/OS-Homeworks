@@ -169,7 +169,6 @@ void handle_files_request(int fd) {
     strcat(index_path, index_name);
     int size;
     if((size = file_exists(index_path)) != -1){
-      printf("here index\n");
       serve_file(fd, index_path, size);
     } else {
       serve_directory(fd, path);
@@ -345,11 +344,12 @@ void serve_forever(int *socket_number, void (*request_handler)(int)) {
         inet_ntoa(client_address.sin_addr),
         client_address.sin_port);
 
-    if(num_threads == 0)
+    if(num_threads == 0) {  
       request_handler(client_socket_number);
-    else 
+      close(client_socket_number);
+    } else 
       wq_push(&work_queue, client_socket_number);
-    close(client_socket_number);
+    
 
     printf("Accepted connection from %s on port %d\n",
         inet_ntoa(client_address.sin_addr),
