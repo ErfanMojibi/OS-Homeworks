@@ -78,7 +78,7 @@ void serve_file(int fd, char *path, int size) {
   buf = malloc(read_buf_size);
   
   while((read_n = read(file_fd, buf, read_buf_size)) > 0){
-    http_send_data(fd, buffw, read_n);
+    http_send_data(fd, buf, read_n);
   }
   free(buf);
   close(file_fd);
