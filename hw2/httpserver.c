@@ -31,6 +31,8 @@ int server_proxy_port;
 typedef struct proxy_thread_args {
   int source_fd;
   int dest_fd;
+  pthread_cond_t* cond;
+  int is_done;
 }  proxy_thread_args;
 /*
 *
@@ -76,7 +78,7 @@ void serve_file(int fd, char *path, int size) {
   buf = malloc(read_buf_size);
   
   while((read_n = read(file_fd, buf, read_buf_size)) > 0){
-    http_send_data(fd, buf, read_n);
+    http_send_data(fd, buffw, read_n);
   }
   free(buf);
   close(file_fd);
@@ -100,17 +102,12 @@ void serve_directory(int fd, char *path) {
     strcpy(ref, path);
     strcat(ref, "/");
     strcat(ref, entry->d_name);
-
-   // printf("<a href=\"%s\">%s</a>\n", ref, entry->d_name);
-
     snprintf(buf, buf_size, "<a href=\"%s\">%s</a>\n", ref, entry->d_name);
     http_send_string(fd, buf);
     free(ref);
   }
   free(buf);
   closedir(dir);
-   
-
 }
 
 
@@ -211,12 +208,13 @@ void send_from_src_to_dest(int src, int dest){
     http_send_data(dest, buf, size);
     // printf("buffer : %s\n", buf);
   }
-  close(src);
   free(buf);
 }
 void* run_proxy_thread(void* args){
   proxy_thread_args* args_ = (proxy_thread_args*) args;
   send_from_src_to_dest(args_->source_fd, args_->dest_fd);
+  args_->is_done = 1;
+  pthread_cond_signal(args_->cond);
   return NULL;
 }
 /*
@@ -281,19 +279,43 @@ void handle_proxy_request(int fd) {
   /* 
   * TODO: Your solution for task 3 belongs here! 
   */
+
+  pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+  pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
+
+
   proxy_thread_args* to_client_args = malloc(sizeof(proxy_thread_args));
   to_client_args->source_fd = target_fd;
   to_client_args->dest_fd = fd;
+  to_client_args->cond = &cond;
+  to_client_args->is_done = 0;
 
   proxy_thread_args* to_server_args = malloc(sizeof(proxy_thread_args));
   to_server_args->source_fd = fd;
   to_server_args->dest_fd = target_fd;
-  
+  to_server_args->cond = &cond;
+  to_server_args->is_done = 0;
+
+
   pthread_t to_server, to_client;
   pthread_create(&to_server, NULL, run_proxy_thread, to_server_args);
   pthread_create(&to_client, NULL, run_proxy_thread, to_client_args);
-  
 
+  while(!(to_server_args->is_done) && !(to_client_args->is_done)){
+    pthread_cond_wait(&cond, &mutex);
+  }
+
+  pthread_cancel(to_server);
+  pthread_cancel(to_client);
+
+  pthread_cond_destroy(&cond);
+  pthread_mutex_destroy(&mutex);
+
+  free(to_client_args);
+  free(to_server_args);
+
+  close(fd);
+  close(target_fd);
 
 }
 
@@ -303,7 +325,6 @@ void *run_thread(void* args){
   while(1){
     int fd = wq_pop(&work_queue);
     request_handler(fd);
-    
   }
 }
 void init_thread_pool(int num_threads, void (*request_handler)(int)) {
