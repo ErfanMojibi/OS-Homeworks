@@ -23,12 +23,15 @@
  * command line arguments (already implemented for you).
  */
 wq_t work_queue;
-int num_threads;
+int num_threads = 1;
 int server_port;
 char *server_files_directory;
 char *server_proxy_hostname;
 int server_proxy_port;
-
+typedef struct proxy_thread_args {
+  int source_fd;
+  int dest_fd;
+}  proxy_thread_args;
 /*
 *
 */
@@ -107,8 +110,6 @@ void serve_directory(int fd, char *path) {
   free(buf);
   closedir(dir);
    
-
-  /* TODO: PART 1 Bullet 3,4 */
 
 }
 
@@ -203,8 +204,21 @@ void handle_files_request(int fd) {
   close(fd);
   return;
 }
-
-
+void send_from_src_to_dest(int src, int dest){
+  int size, buf_size = 1024;
+  char* buf = malloc(buf_size);
+  while((size = read(src, buf, buf_size)) > 0){
+    http_send_data(dest, buf, size);
+    // printf("buffer : %s\n", buf);
+  }
+  close(src);
+  free(buf);
+}
+void* run_proxy_thread(void* args){
+  proxy_thread_args* args_ = (proxy_thread_args*) args;
+  send_from_src_to_dest(args_->source_fd, args_->dest_fd);
+  return NULL;
+}
 /*
  * Opens a connection to the proxy target (hostname=server_proxy_hostname and
  * port=server_proxy_port) and relays traffic to/from the stream fd and the
@@ -267,6 +281,20 @@ void handle_proxy_request(int fd) {
   /* 
   * TODO: Your solution for task 3 belongs here! 
   */
+  proxy_thread_args* to_client_args = malloc(sizeof(proxy_thread_args));
+  to_client_args->source_fd = target_fd;
+  to_client_args->dest_fd = fd;
+
+  proxy_thread_args* to_server_args = malloc(sizeof(proxy_thread_args));
+  to_server_args->source_fd = fd;
+  to_server_args->dest_fd = target_fd;
+  
+  pthread_t to_server, to_client;
+  pthread_create(&to_server, NULL, run_proxy_thread, to_server_args);
+  pthread_create(&to_client, NULL, run_proxy_thread, to_client_args);
+  
+
+
 }
 
 
@@ -274,9 +302,8 @@ void *run_thread(void* args){
   void (*request_handler)(int) = (void (*)(int)) args;
   while(1){
     int fd = wq_pop(&work_queue);
-    // printf("fd:%d\n", fd);
     request_handler(fd);
-    close(fd);
+    
   }
 }
 void init_thread_pool(int num_threads, void (*request_handler)(int)) {
