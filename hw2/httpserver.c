@@ -82,7 +82,7 @@ void serve_file(int fd, char *path, int size) {
 void serve_directory(int fd, char *path) {
   http_start_response(fd, 200);
   http_send_header(fd, "Content-Type", http_get_mime_type(".html"));
-  // content length ?
+  // content length?
   http_end_headers(fd);
   
   int buf_size = 1024;
@@ -98,13 +98,17 @@ void serve_directory(int fd, char *path) {
     strcat(ref, "/");
     strcat(ref, entry->d_name);
 
+   // printf("<a href=\"%s\">%s</a>\n", ref, entry->d_name);
+
     snprintf(buf, buf_size, "<a href=\"%s\">%s</a>\n", ref, entry->d_name);
     http_send_string(fd, buf);
-    
     free(ref);
   }
   free(buf);
   closedir(dir);
+   
+
+  /* TODO: PART 1 Bullet 3,4 */
 
 }
 
@@ -266,21 +270,10 @@ void handle_proxy_request(int fd) {
 }
 
 
-void* run_thread(void* args){
-  void (*request_handler)(int) = args;
-  while(1){
-    int fd = wq_pop(&work_queue);
-    request_handler(fd);
-    close(fd);
-  }
-}
-
 void init_thread_pool(int num_threads, void (*request_handler)(int)) {
-  pthread_t *threads = malloc(num_threads * sizeof(pthread_t));
-  for(int i = 0; i < num_threads; i++){
-    pthread_create(&threads[i], NULL, run_thread, request_handler);
-  }
-  free(threads);
+  /*
+   * TODO: Part of your solution for Task 2 goes here!
+   */
 }
 
 /*
