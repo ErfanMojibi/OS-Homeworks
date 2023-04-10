@@ -127,7 +127,7 @@ void serve_directory(int fd, char *path) {
  *   Closes the client socket (fd) when finished.
  */
 void handle_files_request(int fd) {
-
+  // printf("called with fd:%d\n", fd);
   struct http_request *request = http_request_parse(fd);
 
   if (request == NULL || request->path[0] != '/') {
@@ -137,7 +137,6 @@ void handle_files_request(int fd) {
     close(fd);
     return;
   }
-
   if (strstr(request->path, "..") != NULL) {
     http_start_response(fd, 403);
     http_send_header(fd, "Content-Type", "text/html");
@@ -158,6 +157,7 @@ void handle_files_request(int fd) {
   struct stat sfile;
 
   //stat system call
+  // printf("hello there!!!\n");
   stat(path, &sfile);
   if(S_ISREG(sfile.st_mode)){
       serve_file(fd, path, sfile.st_size);
@@ -169,6 +169,7 @@ void handle_files_request(int fd) {
     strcat(index_path, index_name);
     int size;
     if((size = file_exists(index_path)) != -1){
+      printf("here index\n");
       serve_file(fd, index_path, size);
     } else {
       serve_directory(fd, path);
@@ -274,6 +275,7 @@ void *run_thread(void* args){
   void (*request_handler)(int) = (void (*)(int)) args;
   while(1){
     int fd = wq_pop(&work_queue);
+    // printf("fd:%d\n", fd);
     request_handler(fd);
     close(fd);
   }
