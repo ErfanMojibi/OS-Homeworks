@@ -125,7 +125,7 @@ void serve_directory(int fd, char *path) {
  *   Closes the client socket (fd) when finished.
  */
 void handle_files_request(int fd) {
-  // printf("called with fd:%d\n", fd);
+
   struct http_request *request = http_request_parse(fd);
 
   if (request == NULL || request->path[0] != '/') {
@@ -151,11 +151,9 @@ void handle_files_request(int fd) {
   strcpy(path, server_files_directory);
   strcat(path, request->path);
   
-  // printf("path: %s\n", path);
   struct stat sfile;
 
   //stat system call
-  // printf("hello there!!!\n");
   stat(path, &sfile);
   if(S_ISREG(sfile.st_mode)){
       serve_file(fd, path, sfile.st_size);
@@ -175,41 +173,19 @@ void handle_files_request(int fd) {
     http_send_not_found(fd);
   }
   free(path);
-  /* 
-   * TODO: First is to serve files. If the file given by `path` exists,
-   * call serve_file() on it. Else, serve a 404 Not Found error below.
-   *
-   * TODO: Second is to serve both files and directories. You will need to
-   * determine when to call serve_file() or serve_directory() depending
-   * on `path`.
-   *  
-   * Feel FREE to delete/modify anything on this function.
-   */
-
-
-
-  // http_start_response(fd, 200);
-  // http_send_header(fd, "Content-Type", "text/html");
-  // http_end_headers(fd);
-  // http_send_string(fd,
-  //     "<center>"
-  //     "<h1>Welcome to httpserver!</h1>"
-  //     "<hr>"
-  //     "<p>Nothing's here yet.</p>"
-  //     "</center>");
-
   close(fd);
   return;
 }
+
 void send_from_src_to_dest(int src, int dest){
   int size, buf_size = 1024;
   char* buf = malloc(buf_size);
   while((size = read(src, buf, buf_size)) > 0){
-    http_send_data(dest, buf, size);
-    // printf("buffer : %s\n", buf);
+    http_send_data(dest, buf, size);  
   }
   free(buf);
 }
+
 void* run_proxy_thread(void* args){
   proxy_thread_args* args_ = (proxy_thread_args*) args;
   send_from_src_to_dest(args_->source_fd, args_->dest_fd);
