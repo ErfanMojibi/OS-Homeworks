@@ -56,14 +56,18 @@ s_block_ptr fusion(s_block_ptr b){
     s_block_ptr next = b->next;
 
     if(prev != NULL && prev->is_free){
-        prev->size += BLOCK_SIZE + b->size;
+        prev->size = prev->size + BLOCK_SIZE + b->size;
         prev->next = b->next;
         b = prev;
+        if(next != NULL)
+            next->prev = b;
     }
 
     if(next != NULL && next->is_free){
-        b->size += BLOCK_SIZE + next->size;
+        b->size = b->size + BLOCK_SIZE + next->size;
         b->next = next->next;
+        if(next->next != NULL)
+            next->prev = b;
     }
 
     b->is_free = 1;
@@ -119,6 +123,7 @@ void *mm_malloc(size_t size)
     } else {
         split_block(ptr, size);
     }
+    ptr->is_free = 0;
     memset((void*)ptr + BLOCK_SIZE,0, ptr->size);
     return (void*)ptr + BLOCK_SIZE;
 #endif
@@ -141,6 +146,7 @@ void mm_free(void *ptr)
 #else
     if(ptr == NULL)
         return;
+
     s_block_ptr block = get_block(ptr);
     block->is_free = 1;
     fusion(block);
