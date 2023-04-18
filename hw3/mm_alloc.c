@@ -9,6 +9,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include<string.h>
 /* Your final implementation should comment out this macro. */
 //#define MM_USE_STUBS
 
@@ -19,11 +20,13 @@ s_block_ptr find_free_block(size_t size)
 {
     if (head == NULL)
         return NULL;
-    s_block_ptr current = head;
-    while(current != NULL && current->size <= size)
-        current = current->next;
+    for(s_block_ptr ptr = head; ptr != NULL; ptr = ptr->next){
+        if(ptr->is_free && ptr->size >= size){
+            return ptr;
+        }
+    }
     
-    return current;
+    return NULL;
 
 }
 /* Split block according to size, b must exist */
