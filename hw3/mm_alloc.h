@@ -1,7 +1,7 @@
 /*
  * mm_alloc.h
  *
- * Exports a clone of the interface documented in "man 3 malloc".
+ * Exports a clone of the interface documented in "man 3".
  */
 
 #pragma once
