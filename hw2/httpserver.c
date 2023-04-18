@@ -99,9 +99,10 @@ void serve_directory(int fd, char *path) {
   while ((entry = readdir(dir)) != NULL) {
     
     char* ref = malloc(1024);
-    strcpy(ref, path);
-    strcat(ref, "/");
-    strcat(ref, entry->d_name);
+    // strcpy(ref, path);
+    // strcat(ref, "/");
+    // strcat(ref, entry->d_name);
+    strcpy(ref, entry->d_name);
     snprintf(buf, buf_size, "<a href=\"%s\">%s</a>\n", ref, entry->d_name);
     http_send_string(fd, buf);
     free(ref);

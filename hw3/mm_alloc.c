@@ -42,6 +42,8 @@ void split_block(s_block_ptr b, size_t s){
     new_block->ptr = (void*)(new_block + BLOCK_SIZE);
     
     b->next = new_block;
+    if(next != NULL)
+        next->prev = new_block;
     return;
 }
 
@@ -114,7 +116,8 @@ void *mm_malloc(size_t size)
     } else {
         split_block(ptr, size);
     }
-    return ptr;
+    memset((void*)ptr + BLOCK_SIZE,0, ptr->size);
+    return (void*)ptr + BLOCK_SIZE;
 #endif
     
 }
