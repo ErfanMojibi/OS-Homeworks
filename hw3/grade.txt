@@ -1,22 +1,25 @@
-I finished judging your code on 18-04-2023 at 11:53:44.
+I finished judging your code on 18-04-2023 at 12:18:03.
 
 I ran your code on each test case separately! You can see the results below:
 
 ================================================================================================================
-Test 1: Simple test of alloc and free --> Runtime error occurred (Exit code: -11)
+Test 1: Simple test of alloc and free --> Runtime error occurred (Exit code: 1)
 Although you got no points from this test, below is the output of the test (STDOUT):
 ----------<BEGIN AUTO GENERATED OUTPUT>-----------
 
+Malloc didn't crash!
+Bug in malloc!
 
 -----------<END AUTO GENERATED OUTPUT>------------
 ================================================================================================================
 
 
 ================================================================================================================
-Test 2: Test of exceptional cases --> Runtime error occurred (Exit code: -11)
+Test 2: Test of exceptional cases --> Runtime error occurred (Exit code: 1)
 Although you got no points from this test, below is the output of the test (STDOUT):
 ----------<BEGIN AUTO GENERATED OUTPUT>-----------
 
+It seems you haven't been careful enough...
 
 -----------<END AUTO GENERATED OUTPUT>------------
 ================================================================================================================
@@ -27,6 +30,7 @@ Test 3: Fusion simple test --> Runtime error occurred (Exit code: -11)
 Although you got no points from this test, below is the output of the test (STDOUT):
 ----------<BEGIN AUTO GENERATED OUTPUT>-----------
 
+Ok I just assured that you couldn't allocated 800 GB.
 
 -----------<END AUTO GENERATED OUTPUT>------------
 ================================================================================================================
@@ -37,15 +41,18 @@ Test 4: Fusion complicated test --> Runtime error occurred (Exit code: -11)
 Although you got no points from this test, below is the output of the test (STDOUT):
 ----------<BEGIN AUTO GENERATED OUTPUT>-----------
 
+Ok I just assured that you couldn't allocated 800 GB.
 
 -----------<END AUTO GENERATED OUTPUT>------------
 ================================================================================================================
 
 
 ================================================================================================================
-Test 5: Split block simple test --> Runtime error occurred (Exit code: -11)
+Test 5: Split block simple test --> Runtime error occurred (Exit code: 1)
 Although you got no points from this test, below is the output of the test (STDOUT):
 ----------<BEGIN AUTO GENERATED OUTPUT>-----------
+
+Ok I just assured that you couldn't allocated 800 GB.
 
 
 -----------<END AUTO GENERATED OUTPUT>------------
@@ -57,6 +64,8 @@ Test 6: Test large amount of data --> Runtime error occurred (Exit code: -11)
 Although you got no points from this test, below is the output of the test (STDOUT):
 ----------<BEGIN AUTO GENERATED OUTPUT>-----------
 
+Ok I just assured that you couldn't allocated 800 GB.
+You passed the first step...
 
 -----------<END AUTO GENERATED OUTPUT>------------
 ================================================================================================================
@@ -67,6 +76,7 @@ Test 7: A combination of fusion and split block --> Runtime error occurred (Exit
 Although you got no points from this test, below is the output of the test (STDOUT):
 ----------<BEGIN AUTO GENERATED OUTPUT>-----------
 
+Ok I just assured that you couldn't allocated 800 GB.
 
 -----------<END AUTO GENERATED OUTPUT>------------
 ================================================================================================================
@@ -87,6 +97,7 @@ Test 9: Realloc complicated test --> Runtime error occurred (Exit code: -11)
 Although you got no points from this test, below is the output of the test (STDOUT):
 ----------<BEGIN AUTO GENERATED OUTPUT>-----------
 
+Ok I just assured that you couldn't allocated 800 GB.
 
 -----------<END AUTO GENERATED OUTPUT>------------
 ================================================================================================================
@@ -97,8 +108,9 @@ Test 10: Two dimensional array with arithmetic calculations on a real-world prob
 Although you got no points from this test, below is the output of the test (STDOUT):
 ----------<BEGIN AUTO GENERATED OUTPUT>-----------
 
+Ok you have allocated the array so far.
 
 -----------<END AUTO GENERATED OUTPUT>------------
 ================================================================================================================
 
-Your final grade is: 0/100.0epoch: 1681818824
+Your final grade is: 0/100.0epoch: 1681820284
