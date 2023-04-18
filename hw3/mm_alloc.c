@@ -6,7 +6,7 @@
  */
 
 #include "mm_alloc.h"
-
+#include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
 /* Your final implementation should comment out this macro. */
@@ -63,6 +63,7 @@ s_block_ptr fusion(s_block_ptr b){
 
     b->is_free = 1;
     memset(b->ptr, 0, b->size);
+    return b;
 }
 
 /* Get the block from addr */
@@ -74,7 +75,7 @@ s_block_ptr get_block(void *p){
  * return NULL if things go wrong
  */
 void* extend_heap(size_t s){
-    void* p = sbrk(BLOCK_SIZE + s);
+    void* p = sbrk(s+BLOCK_SIZE);
     if(p == (void*) -1)
         return NULL;
 
