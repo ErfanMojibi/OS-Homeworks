@@ -1,14 +1,15 @@
-I finished judging your code on 18-04-2023 at 12:18:03.
+I finished judging your code on 18-04-2023 at 19:31:25.
 
 I ran your code on each test case separately! You can see the results below:
 
 ================================================================================================================
-Test 1: Simple test of alloc and free --> Runtime error occurred (Exit code: 1)
+Test 1: Simple test of alloc and free --> Runtime error occurred (Exit code: -11)
 Although you got no points from this test, below is the output of the test (STDOUT):
 ----------<BEGIN AUTO GENERATED OUTPUT>-----------
 
 Malloc didn't crash!
-Bug in malloc!
+Malloc first step is ok!
+A simple cmp is ok.
 
 -----------<END AUTO GENERATED OUTPUT>------------
 ================================================================================================================
@@ -113,4 +114,4 @@ Ok you have allocated the array so far.
 -----------<END AUTO GENERATED OUTPUT>------------
 ================================================================================================================
 
-Your final grade is: 0/100.0epoch: 1681820284
+Your final grade is: 0/100.0epoch: 1681846287
