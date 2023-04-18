@@ -40,13 +40,16 @@ void split_block(s_block_ptr b, size_t s){
     // set new block meta data
     new_block->is_free = 1;
     new_block->size = b->size - s - BLOCK_SIZE;
+    
     new_block->next = next;
     new_block->prev = b;
-    new_block->ptr = (void*)(new_block + BLOCK_SIZE);
+    
+    new_block->ptr = (void*)((void*)new_block + BLOCK_SIZE);
     
     b->next = new_block;
     if(next != NULL)
         next->prev = new_block;
+    memset(new_block->ptr, 0, new_block->size);
     return;
 }
 
