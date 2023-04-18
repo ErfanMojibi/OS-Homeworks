@@ -103,7 +103,7 @@ void* extend_heap(size_t s){
 void *mm_malloc(size_t size)
 {
 #ifdef MM_USE_STUBS
-    return calloc(1, size);
+    return;
 #else
 //#error Not implemented.
     
@@ -121,7 +121,7 @@ void *mm_malloc(size_t size)
 void *mm_realloc(void *ptr, size_t size)
 {
 #ifdef MM_USE_STUBS
-    return realloc(ptr, size);
+    return;
 #else
 //#error Not implemented.
 #endif
@@ -130,7 +130,7 @@ void *mm_realloc(void *ptr, size_t size)
 void mm_free(void *ptr)
 {
 #ifdef MM_USE_STUBS
-    free(ptr);
+    return;
 #else
     if(ptr == NULL)
         return;
