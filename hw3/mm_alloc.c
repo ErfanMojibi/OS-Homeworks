@@ -60,22 +60,22 @@ s_block_ptr fusion(s_block_ptr b){
     s_block_ptr prev = b->prev;
     s_block_ptr next = b->next;
 
-    if(prev != NULL && prev->is_free){
-        prev->size = prev->size + BLOCK_SIZE + b->size;
-        prev->next = b->next;
-        b = prev;
-        if(next != NULL)
-            next->prev = b;
-    }
-
     if(next != NULL && next->is_free){
         b->size = b->size + BLOCK_SIZE + next->size;
         b->next = next->next;
         if(next->next != NULL)
             next->prev = b;
     }
+    
+    if(prev != NULL && prev->is_free){
+        prev->size = prev->size + BLOCK_SIZE + b->size;
+        prev->next = b->next;
+        if(b->next != NULL)
+            (b->next)->prev = prev;
+        return prev;
+    }
 
-    b->is_free = 1;
+    
     return b;
 }
 
