@@ -88,14 +88,9 @@ s_block_ptr get_block(void *p){
  * return NULL if things go wrong
  */
 void* extend_heap(size_t s){
-    // int before = sbrk(0);
-    // printf("before extend: %p\n", before);
     void* p = sbrk(s+BLOCK_SIZE);
     if(p == (void*) -1)
         return NULL;
-    // int after = sbrk(0);
-    // printf("after extend: %p\n", after);
-    // printf("change: %d\n", after - before);
     s_block_ptr new_block = (s_block_ptr) p; 
     new_block->size = s;
     new_block->is_free = 0;
