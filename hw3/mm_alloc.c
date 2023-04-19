@@ -52,8 +52,8 @@ void split_block(s_block_ptr b, size_t s){
         next->prev = new_block;
         
     b->size = s;
-    // to fuse if possible:
-    mm_free(new_block->ptr);
+    // to fuse if possible?
+    //mm_free(new_block->ptr);
     return;
 }
 
