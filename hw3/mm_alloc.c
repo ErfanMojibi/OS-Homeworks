@@ -154,7 +154,7 @@ void *mm_realloc(void *ptr, size_t size)
     s_block_ptr ptr_block = get_block(ptr);
     if(ptr_block == NULL)
         return NULL;
-    // malloc new memory
+    // alloc new memory
     void* new_mem = mm_malloc(size);
     if(new_mem){
         if(size < ptr_block->size){
