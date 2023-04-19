@@ -56,7 +56,7 @@ void split_block(s_block_ptr b, size_t s){
 }
 
 /* Try fusing block with neighbors */
-s_block_ptr fusion(s_block_ptr b){
+void fusion(s_block_ptr b){
     s_block_ptr prev = b->prev;
     s_block_ptr next = b->next;
 
@@ -64,7 +64,7 @@ s_block_ptr fusion(s_block_ptr b){
         b->size = b->size + BLOCK_SIZE + next->size;
         b->next = next->next;
         if(next->next != NULL)
-            next->prev = b;
+            (next->next)->prev = b;
     }
     
     if(prev != NULL && prev->is_free){
@@ -72,11 +72,11 @@ s_block_ptr fusion(s_block_ptr b){
         prev->next = b->next;
         if(b->next != NULL)
             (b->next)->prev = prev;
-        return prev;
+        return;
     }
 
     
-    return b;
+    return;
 }
 
 /* Get the block from addr */

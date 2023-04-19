@@ -40,7 +40,7 @@ struct s_block {
 void split_block (s_block_ptr b, size_t s);
 
 /* Try fusing block with neighbors */
-s_block_ptr fusion(s_block_ptr b);
+void fusion(s_block_ptr b);
 
 /* Get the block from addr */
 s_block_ptr get_block (void *p);
