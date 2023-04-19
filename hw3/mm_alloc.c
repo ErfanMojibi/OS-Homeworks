@@ -158,12 +158,12 @@ void *mm_realloc(void *ptr, size_t size)
     void* new_mem = mm_malloc(size);
     if(new_mem){
         if(size < ptr_block->size){
-            //copy and mm_free
+            //copy and remove
             memcpy(new_mem, ptr, size);
             mm_free(ptr);
             return new_mem;
         } else {
-            //copy and free
+            //copy and remove
             memcpy(new_mem, ptr, ptr_block->size);
             mm_free(ptr);
             return new_mem;
