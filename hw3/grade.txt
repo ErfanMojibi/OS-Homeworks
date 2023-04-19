@@ -1,4 +1,4 @@
-I finished judging your code on 19-04-2023 at 10:05:13.
+I finished judging your code on 19-04-2023 at 10:08:13.
 
 Compile error...
 
@@ -8,4 +8,4 @@ There is an occurrence of 'free' in 'mm_alloc.c' which is not allowed! Remove it
 make: *** [Makefile:20: hard] Error 1
 
 -----------<END AUTO GENERATED OUTPUT>------------
-Your final grade is: 0/100.0epoch: 1681898713
+Your final grade is: 0/100.0epoch: 1681898893
