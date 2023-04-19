@@ -81,7 +81,11 @@ s_block_ptr fusion(s_block_ptr b){
 
 /* Get the block from addr */
 s_block_ptr get_block(void *p){
-    return (s_block_ptr)(p - (void*) BLOCK_SIZE);
+    s_block_ptr block = (s_block_ptr)(p - (void*) BLOCK_SIZE);
+    for(s_block_ptr item = head; item != NULL; item = item->next)
+        if(item == block)
+            return block;
+    return NULL;
 }
 
 /* Add a new block at the of heap,
@@ -141,6 +145,23 @@ void *mm_realloc(void *ptr, size_t size)
     return;
 #else
 //#error Not implemented.
+    s_block_ptr ptr_block = get_block(ptr);
+    if(ptr_block == NULL)
+        return NULL;
+
+    void* new_mem = mm_malloc(size);
+    if(new_mem){
+        if(size < ptr_block->size){
+            memcpy(new_mem, ptr, size);
+            mm_free(ptr);
+            return new_mem;
+        } else {
+            memcpy(new_mem, ptr, ptr_block->size);
+            mm_free(ptr);
+            return new_mem;
+        }
+    }
+    return NULL;
 #endif
 }
 
@@ -153,6 +174,9 @@ void mm_free(void *ptr)
         return;
 
     s_block_ptr block = get_block(ptr);
+    if(block == NULL)
+        return NULL;
+
     block->is_free = 1;
     fusion(block);
 #endif
