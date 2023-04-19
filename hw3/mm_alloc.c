@@ -44,11 +44,13 @@ void split_block(s_block_ptr b, size_t s){
     new_block->next = next;
     new_block->prev = b;
     
-    new_block->ptr = (void*)((void*)new_block + BLOCK_SIZE);
+    new_block->ptr = ((void*)new_block + BLOCK_SIZE);
     
     b->next = new_block;
     if(next != NULL)
         next->prev = new_block;
+        
+    b->size = s;
     memset(new_block->ptr, 0, new_block->size);
     return;
 }
@@ -74,7 +76,6 @@ s_block_ptr fusion(s_block_ptr b){
     }
 
     b->is_free = 1;
-    memset(b->ptr, 0, b->size);
     return b;
 }
 
@@ -87,15 +88,19 @@ s_block_ptr get_block(void *p){
  * return NULL if things go wrong
  */
 void* extend_heap(size_t s){
+    // int before = sbrk(0);
+    // printf("before extend: %p\n", before);
     void* p = sbrk(s+BLOCK_SIZE);
     if(p == (void*) -1)
         return NULL;
-
+    // int after = sbrk(0);
+    // printf("after extend: %p\n", after);
+    // printf("change: %d\n", after - before);
     s_block_ptr new_block = (s_block_ptr) p; 
     new_block->size = s;
     new_block->is_free = 0;
     new_block->next = NULL;
-    new_block->ptr = (void*) ((void*)new_block + BLOCK_SIZE);
+    new_block->ptr = ((void*)new_block + BLOCK_SIZE);
 
     /* find last element in linked list and append new mmeory to list*/
     s_block_ptr last = head;
@@ -119,7 +124,9 @@ void *mm_malloc(size_t size)
     return;
 #else
 //#error Not implemented.
-    
+    if(size == 0)
+        return NULL;
+
     s_block_ptr ptr = find_free_block(size);
     if (ptr == NULL){
         return extend_heap(size);
@@ -127,7 +134,7 @@ void *mm_malloc(size_t size)
         split_block(ptr, size);
     }
     ptr->is_free = 0;
-    memset((void*)ptr + BLOCK_SIZE,0, ptr->size);
+    memset((void*)ptr + BLOCK_SIZE, 0, ptr->size);
     return (void*)ptr + BLOCK_SIZE;
 #endif
     
