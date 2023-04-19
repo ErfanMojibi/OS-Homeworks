@@ -1,4 +1,4 @@
-I finished judging your code on 19-04-2023 at 10:27:59.
+I finished judging your code on 19-04-2023 at 10:33:05.
 
 I ran your code on each test case separately! You can see the results below:
 
@@ -35,14 +35,7 @@ Apparently Split block is not working
 
 
 ================================================================================================================
-Test 6: Test large amount of data --> Runtime error occurred (Exit code: -11)
-Although you got no points from this test, below is the output of the test (STDOUT):
-----------<BEGIN AUTO GENERATED OUTPUT>-----------
-
-Ok I just assured that you couldn't allocated 800 GB.
-You passed the first step...
-
------------<END AUTO GENERATED OUTPUT>------------
+Test 6: Test large amount of data --> Time limit exceeded(20s)! 0 points :(
 ================================================================================================================
 
 
@@ -77,4 +70,4 @@ Test 9: Realloc complicated test --> OK! 17.5 points; Afarin!!!
 Test 10: Two dimensional array with arithmetic calculations on a real-world problem --> OK! 13.8 points; Afarin!!!
 ================================================================================================================
 
-Your final grade is: 51.4/100.0epoch: 1681900079
+Your final grade is: 51.4/100.0epoch: 1681900385
