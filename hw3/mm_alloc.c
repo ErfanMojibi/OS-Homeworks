@@ -158,7 +158,7 @@ void *mm_realloc(void *ptr, size_t size)
     void* new_mem = mm_malloc(size);
     if(new_mem){
         if(size < ptr_block->size){
-            //copy and free
+            //copy and mm_free
             memcpy(new_mem, ptr, size);
             mm_free(ptr);
             return new_mem;
