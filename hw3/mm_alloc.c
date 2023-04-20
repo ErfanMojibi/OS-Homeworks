@@ -31,7 +31,7 @@ s_block_ptr find_free_block(size_t size)
 }
 /* Split block according to size, b must exist */
 void split_block(s_block_ptr b, size_t s){
-    if (BLOCK_SIZE + s < b->size)
+    if (BLOCK_SIZE + s > b->size)
         return;
 
     b->is_free = 0;
@@ -53,7 +53,7 @@ void split_block(s_block_ptr b, size_t s){
         
     b->size = s;
     // to fuse if possible?
-    //mm_free(new_block->ptr);
+    mm_free(new_block->ptr);
     return;
 }
 
