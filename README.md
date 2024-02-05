@@ -1,5 +1,5 @@
 # OS-Homeworks
-Operating Systems Hoemworks:
+Operating Systems Homeworks:
 * HW0: Working with GDB
 * HW1: Simple shell implementation
 * HW2: Simple http server and proxy implementation
